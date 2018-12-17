@@ -4,6 +4,7 @@ import com.crudapi.library.domain.Copy;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,7 +17,7 @@ public interface CopyRepository extends CrudRepository<Copy, Long> {
     Optional<Copy> findById(Long id);
 
     @Override
-    Iterable<Copy> findAll();
+    List<Copy> findAll();
 
     @Override
     void deleteById(Long id);

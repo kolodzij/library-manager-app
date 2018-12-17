@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,15 +18,14 @@ public class Copy {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "titleid")
-    private Long titleId;
+    @ManyToOne
+    @JoinColumn(name = "titleid")
+    private Title title;
 
     @Column(name = "status")
     private String status;
 
-    @ManyToOne
-    @JoinColumn(name = "titleid")
-    private Title title;
+
 
 //    @OneToMany(targetEntity = Borrows.class,
 //            mappedBy = "copy",
