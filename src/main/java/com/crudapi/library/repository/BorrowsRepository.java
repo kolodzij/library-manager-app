@@ -16,9 +16,12 @@ public interface BorrowsRepository extends CrudRepository<Borrows, Long> {
     @Override
     Optional<Borrows> findById(Long id);
 
+    Optional<Borrows>findByCopy_Id(Long id);
+
     @Override
     List<Borrows> findAll();
 
     @Override
     void deleteById(Long id);
+
 }

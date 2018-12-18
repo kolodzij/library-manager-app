@@ -25,6 +25,8 @@ public class BorrowsDbService {
         return borrowsRepository.findById(id);
     }
 
+    public Optional<Borrows> getByCopyId(final Long id) {return  borrowsRepository.findByCopy_Id(id);}
+
     public void delete(final Long id) {
         borrowsRepository.deleteById(id);
     }

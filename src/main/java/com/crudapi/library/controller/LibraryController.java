@@ -61,11 +61,11 @@ public class LibraryController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/returnCopy")
-    public void returnCopy(@RequestParam Long borrowsId) throws RequestNotFoundException {
-        borrowsService.getById(borrowsId).orElseThrow(RequestNotFoundException::new).setReturnedDate(LocalDate.now());
-        borrowsService.save( borrowsService.getById(borrowsId).orElseThrow(RequestNotFoundException::new));
-        borrowsService.getById(borrowsId).orElseThrow(RequestNotFoundException::new).getCopy().setStatus("AVAILABLE");
-        copyService.save(borrowsService.getById(borrowsId).orElseThrow(RequestNotFoundException::new).getCopy());
+    public void returnCopy(@RequestParam Long copyId) throws RequestNotFoundException {
+        borrowsService.getByCopyId(copyId).orElseThrow(RequestNotFoundException::new).setReturnedDate(LocalDate.now());
+        borrowsService.save( borrowsService.getByCopyId(copyId).orElseThrow(RequestNotFoundException::new));
+        copyService.getById(copyId).orElseThrow(RequestNotFoundException::new).setStatus("AVAILABLE");
+        copyService.save(copyService.getById(copyId).orElseThrow(RequestNotFoundException::new));
     }
 
 
