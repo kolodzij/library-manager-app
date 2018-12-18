@@ -3,6 +3,7 @@ package com.crudapi.library.domain;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -35,6 +36,7 @@ public class Borrows {
     private LocalDate borrowedDate;
 
     @Column(name = "returned")
+    @Setter
     private LocalDate returnedDate;
 
 

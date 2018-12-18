@@ -18,7 +18,7 @@ public class CopyMapper {
     public Copy mapToCopy(final CopyDto copyDto) {
         return new Copy(
                 copyDto.getId(),
-                titleDbService.getById(copyDto.getId()).orElse(null),
+                titleDbService.getById(copyDto.getTitleId()).orElse(null),
                 copyDto.getStatus()
         );
     }

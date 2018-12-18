@@ -21,4 +21,6 @@ public interface CopyRepository extends CrudRepository<Copy, Long> {
 
     @Override
     void deleteById(Long id);
+
+    List<Copy> findAllByTitleId(Long id);
 }

@@ -1,7 +1,6 @@
 package com.crudapi.library.controller;
 
-import com.crudapi.library.domain.ReaderDto;
-import com.crudapi.library.domain.TitleDto;
+import com.crudapi.library.domain.*;
 import com.crudapi.library.mapper.BorrowsMapper;
 import com.crudapi.library.mapper.CopyMapper;
 import com.crudapi.library.mapper.ReaderMapper;
@@ -13,6 +12,7 @@ import com.crudapi.library.service.TitleDbService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -28,6 +28,7 @@ public class LibraryController {
 
     @Autowired
     private ReaderDbService readerService;
+
     @Autowired
     private ReaderMapper readerMapper;
 
@@ -42,14 +43,40 @@ public class LibraryController {
     private BorrowsMapper borrowsMapper;
 
 
+    @RequestMapping(method = RequestMethod.GET, value = "/getCopiesOfTitle")
+    public List<CopyDto> getAllCopiesOfTitle(@RequestParam Long titleId) {
+        return copyMapper.mapToCopyDtoList(copyService.getCopiesByTitle(titleId));
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/borrowCopy")
+    public void borrowCopy(@RequestParam  Long readerId, Long copyId) throws RequestNotFoundException {
+        Borrows borrow = new Borrows(null,
+                readerService.getById(readerId).orElseThrow(RequestNotFoundException::new),
+                copyService.getById(copyId).orElseThrow(RequestNotFoundException::new),
+                LocalDate.now(),
+                null
+        );
+        copyService.getById(copyId).orElseThrow(RequestNotFoundException::new).setStatus("BORROWED");
+        borrowsService.save(borrow);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/returnCopy")
+    public void returnCopy(@RequestParam Long borrowsId) throws RequestNotFoundException {
+        borrowsService.getById(borrowsId).orElseThrow(RequestNotFoundException::new).setReturnedDate(LocalDate.now());
+        borrowsService.save( borrowsService.getById(borrowsId).orElseThrow(RequestNotFoundException::new));
+        borrowsService.getById(borrowsId).orElseThrow(RequestNotFoundException::new).getCopy().setStatus("AVAILABLE");
+        copyService.save(borrowsService.getById(borrowsId).orElseThrow(RequestNotFoundException::new).getCopy());
+    }
+
+
     @RequestMapping(method = RequestMethod.GET, value = "/getAllTitles")
     public List<TitleDto> getAllTitles() {
         return titleMapper.mapToTitleDtoList(titleService.getAll());
     }
 
     @RequestMapping(method=RequestMethod.GET, value = "/getTitle")
-    public TitleDto getTitle(@RequestParam Long id) throws TitleNotFoundException {
-       return titleMapper.mapToTitleDto(titleService.getById(id).orElseThrow(TitleNotFoundException::new));
+    public TitleDto getTitle(@RequestParam Long id) throws RequestNotFoundException {
+       return titleMapper.mapToTitleDto(titleService.getById(id).orElseThrow(RequestNotFoundException::new));
     }
 
     @RequestMapping(method=RequestMethod.DELETE, value="/deleteTitle")
@@ -75,8 +102,8 @@ public class LibraryController {
     }
 
     @RequestMapping(method=RequestMethod.GET, value = "/getReader")
-    public ReaderDto getReader(@RequestParam Long id) throws ReaderNotFoundException {
-        return readerMapper.mapToReaderDto(readerService.getById(id).orElseThrow(ReaderNotFoundException::new));
+    public ReaderDto getReader(@RequestParam Long id) throws RequestNotFoundException {
+        return readerMapper.mapToReaderDto(readerService.getById(id).orElseThrow(RequestNotFoundException::new));
     }
 
     @RequestMapping(method=RequestMethod.DELETE, value="/deleteReader")
@@ -95,5 +122,33 @@ public class LibraryController {
     }
 
 
+    @RequestMapping(method = RequestMethod.GET, value = "/getAllCopies")
+    public List<CopyDto> getAllCopies() {
+        return copyMapper.mapToCopyDtoList(copyService.getAll());
+    }
 
+    @RequestMapping(method=RequestMethod.GET, value = "/getCopy")
+    public CopyDto getCopy(@RequestParam Long id) throws RequestNotFoundException {
+        return copyMapper.mapToCopyDto(copyService.getById(id).orElseThrow(RequestNotFoundException::new));
+    }
+
+    @RequestMapping(method=RequestMethod.DELETE, value="/deleteCopy")
+    public void deleteCopy(@RequestParam Long id) {
+        copyService.delete(id);
+    }
+
+    @RequestMapping(method = RequestMethod.PUT, value = "/updateCopy")
+    public CopyDto updateCopy(@RequestBody CopyDto copyDto) {
+        return copyMapper.mapToCopyDto(copyService.save(copyMapper.mapToCopy(copyDto)));
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/createCopy", consumes = APPLICATION_JSON_VALUE)
+    public void createCopy(@RequestBody CopyDto copyDto) {
+        copyService.save(copyMapper.mapToCopy(copyDto));
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/getAllBorrows")
+    public List<BorrowsDto> getAllBorrows() {
+        return borrowsMapper.mapToBorrowsDtoList(borrowsService.getAll());
+    }
 }
